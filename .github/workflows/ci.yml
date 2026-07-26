@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  build-lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project (with dev dependencies)
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: python -m ruff check .
+
+      - name: Format check
+        run: python -m ruff format --check .
+
+      - name: Build
+        run: python -m compileall -q src
+
+      - name: Test
+        run: python -m pytest
